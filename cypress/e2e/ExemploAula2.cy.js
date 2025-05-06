@@ -21,12 +21,18 @@ describe("Testes do registro e login de um novo usuário", () => {
 
     it("Teste que deve logar com sucesso", () => {
         let infos = criarUser();
-        cy.visit("https://globalsqa.com/angularJs-protractor/registration-login-example/#/login");
-        cy.get('#username').type(infos.ID);
-        cy.get('#password').type(infos.senha);
-        cy.get('.btn-primary').click();
+        login(infos);
         cy.get('.ng-binding').should("contain.text", "Registration successful");
         cy.get('.ng-binding').should("contain.text", infos.ID);
+    })
+
+    it("Teste que falha ao logar com usuário deletado", () => {
+        let infos = criarUser();
+        login(infos);
+        cy.get('.ng-binding > a').click();
+        cy.get('.btn').click();
+        login(infos);
+        cy.get('.ng-binding').should("contain.text", "Username or password is incorrect");
     })
 })
 
@@ -51,4 +57,11 @@ function criarUser() {
     cy.get('.ng-binding').should("contain.text", "Registration successful");
 
     return infos;
+}
+
+function login(infos) {
+    cy.visit("https://globalsqa.com/angularJs-protractor/registration-login-example/#/login");
+    cy.get('#username').type(infos.ID);
+    cy.get('#password').type(infos.senha);
+    cy.get('.btn-primary').click();
 }
